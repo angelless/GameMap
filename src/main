@@ -21,43 +21,54 @@ public class main extends PluginBase implements Listener {
 		
 		this.getServer().getPluginManager().registerEvents(this, this);
 		this.getDataFolder().mkdirs();
+	this.getServer().getScheduler().scheduleAsyncTask(new AsyncTask() {
 
-		BufferedImage image;
-		try {
-			image = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
-			Graphics2D graphics = image.createGraphics();
-			Position spawn = this.getServer().getDefaultLevel().getSafeSpawn();
-			for (int x = 0; x < 200; x++) {
-				for (int y = 0; y < 200; y++) {
-					graphics.setColor(this.getServer().getDefaultLevel().getMapColorAt(spawn.getFloorX() - 100 + x,
-							spawn.getFloorZ() - 100 + y));
-					graphics.fillRect(x, y, x, y);
+			@Override
+			public void onRun() {
+				BufferedImage image;
+				try {
+					image = new BufferedImage(600, 600, BufferedImage.TYPE_INT_RGB);
+					Graphics2D graphics = image.createGraphics();
+					Position spawn = getServer().getDefaultLevel().getSafeSpawn();
+					for (int x = 0; x < 600; x++) {
+						for (int y = 0; y < 600; y++) {
+							graphics.setColor(getServer().getDefaultLevel().getMapColorAt(spawn.getFloorX() - 
+									300 + x,
+									spawn.getFloorZ() - 300 + y));
+							graphics.fillRect(x, y, x, y);
+						}
+					}
+					for (Player player : getServer().getOnlinePlayers().values()) {
+						int x = player.getPosition().getFloorX();
+						int y = player.getPosition().getFloorZ();
+						Position spawn1 = getServer().getDefaultLevel().getSafeSpawn();
+
+						if (x <= spawn1.getFloorX() + 300 && x >= spawn1.getFloorX() - 300
+								|| y <= spawn1.getFloorZ() + 300 && y >= spawn1.getFloorZ() - 300) {
+
+							graphics.setColor(Color.RED);
+							graphics.fillRect((spawn.getFloorX() - x) + 299, (spawn.getFloorZ() - y) + 299,
+									//(spawn.getFloorX() - x) + 300, (spawn.getFloorZ() - y) + 300
+									2,2);
+							graphics.setColor(Color.BLACK);
+							graphics.drawString(player.getName(), (spawn.getFloorX() - x) + 300,
+									(spawn.getFloorZ() - y) + 296);
+
+						}
+					}
+					try {
+						File file = new File(getDataFolder() + "/world.jpeg");
+						ImageIO.write(image, "jpeg", file);
+						getLogger().info("finsh");
+					} catch (IOException e) {
+						// TODO 자동 생성된 catch 블록
+						e.printStackTrace();
+					}
+				} finally {
 				}
 			}
-			for (Player player : this.getServer().getOnlinePlayers().values()) {
-				int x = player.getPosition().getFloorX();
-				int y = player.getPosition().getFloorZ();
-				Position spawn1 = this.getServer().getDefaultLevel().getSafeSpawn();
 
-				if (x <= spawn1.getFloorX() + 100 && x >= spawn1.getFloorX() - 100
-						|| y <= spawn1.getFloorZ() + 100 && y >= spawn1.getFloorZ() - 100) {
-					this.getLogger().alert("12123");
-					graphics.setColor(Color.white);
-					graphics.fillRect( (spawn.getFloorX()-x)+100, (spawn.getFloorZ()-y)+100, (spawn.getFloorX()-x)+100, (spawn.getFloorZ()-y)+100);
-					graphics.setColor(Color.PINK);
-					graphics.drawString(player.getName(), (spawn.getFloorX()-x)+100, (spawn.getFloorZ()-y)+100);
-					
-				}
-			}
-			try {
-				File file = new File(this.getDataFolder() + "/world.jpeg");
-				ImageIO.write(image, "jpeg", file);
-			} catch (IOException e) {
-				// TODO 자동 생성된 catch 블록
-				e.printStackTrace();
-			}
-		} finally {
-		}
+		});
 	}
 
 }
